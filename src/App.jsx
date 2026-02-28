@@ -1,35 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import {useState,useEffect,useMemo} from 'react'
+import axios from 'axios' 
+import PatientCard from './PatientCard.jsx'
+function App(){
+  const [patients,setPatients]=useState([])
+  const [search,setSearch]=useState("")
+  const [loading,setLoading]=useState(true)
+  useEffect(()=>{
+    axios.get("https://doc-back.onrender.com/patients")
+      .then((res)=>{
+        console.log(res.data)
+        setPatients(res.data)
+        setLoading(false)
+      })
+      .catch((err)=>{
+        console.log(err)
+      })
+  },[])
 
-function App() {
-  const [count, setCount] = useState(0)
+  const filteredPatients= useMemo(()=>{
+    return patients.filter((i)=>
+      i.name.toLowerCase().includes(search.toLowerCase())
+    )
+  },[search,patients])
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+  return(
+    <div className='container mt-4'>
+      <h2 className='text-center'>Patient Dashboard</h2>
+      <input 
+        type="text" 
+        className='form-control mb-4' 
+        placeholder="Search patient by name" 
+        onChange={(e)=>setSearch(e.target.value)}/>
+      {
+        loading && <div className='alert alert-info'>Loading...</div>
+      }
+      {
+        !loading && filteredPatients.map((i)=>(
+          <div className='col-md-4' key={i.id}>
+            <PatientCard patient={i}/>
+          </div>
+        ))
+      }
+    </div>
   )
 }
-
 export default App
