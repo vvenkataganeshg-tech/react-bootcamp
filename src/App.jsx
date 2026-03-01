@@ -34,13 +34,26 @@ function App(){
       {
         loading && <div className='alert alert-info'>Loading...</div>
       }
+      <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+      {
+        !loading && filteredPatients.length==0 &&(
+          <div className="col">
+            <div className='alert alert-warning text-center'>
+              No patient found
+            </div>
+          </div>
+        )
+      }
       {
         !loading && filteredPatients.map((i)=>(
-          <div className='col-md-4' key={i.id}>
+          <div className='col' key={i.id}>
             <PatientCard patient={i}/>
           </div>
         ))
       }
+
+      </div>
+      
     </div>
   )
 }
